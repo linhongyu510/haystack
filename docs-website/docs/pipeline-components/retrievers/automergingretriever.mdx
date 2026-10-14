@@ -32,8 +32,10 @@ This can be particularly useful when working with paragraphs split into multiple
 Here is how this Retriever works:
 
 1. It requires documents to be organized in a tree structure, with leaf nodes stored in a document index - see [`HierarchicalDocumentSplitter`](../preprocessors/hierarchicaldocumentsplitter.mdx) documentation.
-2. When searching, it counts how many leaf documents under the same parent match your query.
-3. If this count exceeds your defined threshold, it returns the parent document instead of the individual leaves.
+2. When searching, it counts the distinct matched child document IDs under each parent.
+3. If the ratio of that count to the parent's total number of children is strictly greater than your threshold, it returns the parent document instead of the individual children.
+
+Repeated occurrences of the same child do not increase the merge score. For example, overlapping sentence windows can return five entries with only three distinct children under a parent with four children. The score is `3 / 4 = 0.75`, not `5 / 4 = 1.25`, so a threshold of `0.8` does not trigger a merge. When children are not merged, their order and duplicate occurrences are preserved.
 
 The `AutoMergingRetriever` can currently be used by the following Document Stores:
 
@@ -70,7 +72,7 @@ retriever = AutoMergingRetriever(doc_store_parents, threshold=0.5)
 
 # assume we retrieved 2 leaf docs from the same parent, the parent document should be returned,
 # since it has 3 children and the threshold=0.5, and we retrieved 2 children (2/3 > 0.5)
-leaf_docs = [doc for doc in docs if not doc.meta["__children_ids"]]
+leaf_docs = [doc for doc in docs["documents"] if not doc.meta["__children_ids"]]
 retrieved_docs = retriever.run(leaf_docs[4:6])
 print(retrieved_docs["documents"])
 # >> [Document(id=bcc..., content: 'warm glow over the trees. Birds began to sing.',

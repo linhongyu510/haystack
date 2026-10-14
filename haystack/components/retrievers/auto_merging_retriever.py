@@ -116,7 +116,9 @@ class AutoMergingRetriever:
         Run the AutoMergingRetriever.
 
         Recursively groups documents by their parents and merges them if they meet the threshold,
-        continuing up the hierarchy until no more merges are possible.
+        continuing up the hierarchy until no more merges are possible. The merge score counts distinct
+        child document IDs, so repeated matches do not increase parent coverage. When no merge occurs,
+        child documents retain their original order and duplicate occurrences.
 
         :param documents: List of leaf documents that were matched by a retriever
         :returns:
@@ -172,7 +174,9 @@ class AutoMergingRetriever:
         Asynchronously run the AutoMergingRetriever.
 
         Recursively groups documents by their parents and merges them if they meet the threshold,
-        continuing up the hierarchy until no more merges are possible.
+        continuing up the hierarchy until no more merges are possible. The merge score counts distinct
+        child document IDs, so repeated matches do not increase parent coverage. When no merge occurs,
+        child documents retain their original order and duplicate occurrences.
 
         :param documents: List of leaf documents that were matched by a retriever
         :returns:
