@@ -14,14 +14,12 @@ from haystack.document_stores.in_memory import InMemoryDocumentStore
 @pytest.mark.parametrize("use_async", [False, True])
 @pytest.mark.parametrize(
     ("indices", "threshold", "merges"),
-    [
-        ([0, 0, 0], 0.5, False),
-        ([0, 1, 0, 1], 0.5, False),
-        ([0, 1, 2], 0.5, True),
-        ([2, 0, 1, 0], 0.75, False),
-    ],
+    [([0, 0, 0], 0.5, False), ([0, 1, 0, 1], 0.5, False), ([0, 1, 2], 0.5, True), ([2, 0, 1, 0], 0.75, False)],
 )
-async def test_merge_score_counts_distinct_children(indices, threshold, merges, use_async):
+async def test_merge_score_counts_distinct_children(
+    indices: list[int], threshold: float, merges: bool, use_async: bool
+) -> None:
+    """Duplicate matches must not increase coverage or change unmerged output order."""
     hierarchy = HierarchicalDocumentSplitter(block_sizes={2}).run(
         [Document(content="one two three four five six seven eight")]
     )["documents"]
@@ -38,7 +36,8 @@ async def test_merge_score_counts_distinct_children(indices, threshold, merges, 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("use_async", [False, True])
-async def test_overlapping_windows_do_not_inflate_parent_coverage(use_async):
+async def test_overlapping_windows_do_not_inflate_parent_coverage(use_async: bool) -> None:
+    """Real sentence-window output covers three, not five, of four child nodes."""
     hierarchy = HierarchicalDocumentSplitter(block_sizes={2}).run(
         [Document(content="one two three four five six seven eight")]
     )["documents"]
