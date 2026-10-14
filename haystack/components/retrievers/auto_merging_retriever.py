@@ -150,8 +150,8 @@ class AutoMergingRetriever:
             for parent_doc_id, child_docs in parent_doc_id_to_child_docs.items():
                 parent_doc = _get_parent_doc(parent_doc_id)
 
-                # Calculate merge score
-                score = len(child_docs) / len(parent_doc.meta["__children_ids"])
+                # Repeated matches of the same child must not inflate parent coverage.
+                score = len({doc.id for doc in child_docs}) / len(parent_doc.meta["__children_ids"])
                 if score > self.threshold:
                     merged_docs.append(parent_doc)  # Merge into parent
                 else:
@@ -209,8 +209,8 @@ class AutoMergingRetriever:
             for parent_doc_id, child_docs in parent_doc_id_to_child_docs.items():
                 parent_doc = await _get_parent_doc(parent_doc_id)
 
-                # Calculate merge score
-                score = len(child_docs) / len(parent_doc.meta["__children_ids"])
+                # Repeated matches of the same child must not inflate parent coverage.
+                score = len({doc.id for doc in child_docs}) / len(parent_doc.meta["__children_ids"])
                 if score > self.threshold:
                     merged_docs.append(parent_doc)  # Merge into parent
                 else:
