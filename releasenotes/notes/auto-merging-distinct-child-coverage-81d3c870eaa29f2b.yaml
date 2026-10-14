@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Fix ``AutoMergingRetriever.run()`` and ``run_async()`` to calculate parent
+    coverage using distinct child document IDs. Repeated matches, such as those
+    from overlapping sentence windows, no longer trigger a parent merge without
+    enough distinct children. Unmerged document order and duplicates are preserved.
